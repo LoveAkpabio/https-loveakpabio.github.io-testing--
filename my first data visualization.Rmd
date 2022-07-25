@@ -1,0 +1,106 @@
+---
+title: "simple data visualization"
+author: "LoveA"
+date: '2022-07-25'
+output: html_document
+---
+
+                           My First Data Visualization 
+
+let's load some libraries
+```{r}
+library(tidyverse) # helps us to interact with data
+library(gapminder) # Gives us access to the dataset "gapminder"
+library(patchwork) # Helps in data visualization
+```
+
+```{r}
+data() # shows data stored in R
+```
+data: gapminder
+
+* Question 1: What is the mean life expectancy in "Africa" ?
+```{r}
+View(gapminder) # to view the data set
+```
+N/B:   we will be using %>% operator and some functions in our coding
+
+* %>% => This is called 'piped in operator'. It informs R about the data you want to bring into the next line of code.
+
+```{r}
+gapminder %>% 
+  filter(continent =="Africa") %>%  # used to filter out the particular population 
+  select(lifeExp, continent) %>%    # select() used to select the variable
+  summarise(mean = mean(lifeExp))   # summarise() used to summarise result
+```
+Answer: The mean life expectancy in Africa is 48.9yrs
+
+The mean life expectancy can also be calculated using Pull()
+```{r}
+gapminder %>% 
+  filter(continent =="Africa") %>% 
+  pull(lifeExp) %>% 
+  mean() %>% 
+  signif(4)     # helps to round up to 4 decimal point
+
+```
+
+Data Visualization: Plot a density graph for the mean life Expectancy in Africa
+
+before we include ggplot to our code, let's assing the value of the mean life expectancy in Africa to a variable. that variable will be called "mean_x"
+
+```{r}
+mean_x <- gapminder %>% 
+  filter(continent =="Africa") %>% 
+  pull(lifeExp) %>% 
+  mean() %>% 
+  signif(4)
+```
+
+```{r}
+View(mean_x) # view the variable
+```
+ 
+```{r}
+gapminder %>% 
+  filter(continent =="Africa") %>% 
+  select(continent,lifeExp) %>% 
+  ggplot(aes(lifeExp))+
+  geom_density(fill="blue", alpha = 0.5)+
+  scale_x_log10()+
+  geom_vline(xintercept = mean_x, color="red")+
+  labs(title = "Mean lifeExp in Africa")+
+  annotate("text", x=60, y=4.5, label ="mean lifeExp is 48.87")
+```
+ 
+* Question 2: calculate the mean life expectancy for all continent and plot a    graph indicating point of each variances.
+
+First of all; let's calculate the mean lifeExp for the five continent
+
+```{r}
+ gapminder %>% 
+  select(continent, lifeExp) %>% 
+  group_by(continent) %>% 
+  summarise(mean =mean(lifeExp)) %>%
+  arrange(mean)
+```
+Answer: Africa 48.9; Asia 60.1; Americas 64.7; Europe 71.9; Oceania 74.3
+
+Now, let's create a new object called "p" and assign the mean values to it
+```{r}
+p <- gapminder %>% 
+  select(continent, lifeExp) %>% 
+  group_by(continent) %>% 
+  summarise(mean =mean(lifeExp)) %>%
+  arrange(mean)
+```
+Let's include ggplot to our code
+```{r}
+p %>% 
+  ggplot(aes(x=mean, y= continent))+
+  geom_point(size =1, color="red")+
+  labs(title = "A plot showing mean lifeExp for each continent",
+       x = "mean_lifeEXP")
+```
+
+
