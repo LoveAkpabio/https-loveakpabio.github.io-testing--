@@ -1,0 +1,85 @@
+---
+title: "Analysis of Variance"
+author: "LoveA"
+date: '2022-07-25'
+output: html_document
+---
+
+                  Analysis Of Variance using R
+
+Anova is the analysis of comparing averages of three or more population
+
+data: gapminder
+
+data location: R-studio
+
+load libraries
+```{r}
+library(tidyverse)
+library(gapminder)
+library(patchwork)
+library(forcats)
+```
+
+Population sample: "Asia", "Americas", "Europe"
+
+Research Question: Is the life expectancy in these three countries different?
+
+Hypotheses Testing:
+
+* H0: There's no difference in the mean life expectancy in the three                           population, Mean life expectancy is the same.
+
+* H1: Mean life expectancy is not the same.
+
+Observation: Difference in mean is observed in the sample data,but is this statistically significant (alpha = 0.05)
+
+Let's create a new dataset from gapminder
+```{r}
+data <- gapminder %>% 
+  filter(continent %in% c("Asia", "Americas", "Europe"),
+         year == 2007) %>% 
+  select(continent, lifeExp)
+```
+
+Now we have created a new dataset, let's analyse the distribution of mean 
+
+```{r}
+data %>% 
+  group_by(continent) %>% 
+  summarise(mean = mean(lifeExp)) %>% 
+  arrange(mean)
+```
+
+Now we have seen the distribution of mean.
+
+Let's create ANOVA Model
+```{r}
+data %>% 
+  aov(lifeExp ~ continent, data =.) %>% 
+  summary()
+```
+P-value is less than 5%, it indicate there's significant difference in the mean lifeExp of the three population.
+
+H0: Is Rejected
+H1: Is Accepted
+
+Note: How to know which population is actually different from each other.
+
+```{r}
+data %>% 
+  aov(lifeExp ~ continent, data =.) %>% 
+  TukeyHSD()
+  
+```
+
+The result states that Europe - Asia has a large significant difference having a p-value of 1.89e-05
+
+
+
+
+
+
+
+
+
+
